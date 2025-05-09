@@ -1,0 +1,38 @@
+<div class="lealtad-container">
+  <div class="card">
+    <div class="card-header">
+      <h2>Programa de Lealtad</h2>
+    </div>
+    <div class="card-body">
+      <div class="puntos-info">
+        <h3>Puntos Disponibles</h3>
+        <div class="puntos-display">{{ puntosDisponibles }}</div>
+      </div>
+
+      <div class="canje-puntos">
+        <h3>Canjear Puntos</h3>
+        <div class="form-group">
+          <label for="puntosACanjear">Cantidad de puntos a canjear:</label>
+          <input 
+            type="number" 
+            id="puntosACanjear" 
+            [(ngModel)]="puntosACanjear" 
+            class="form-control"
+            min="1"
+            [max]="puntosDisponibles"
+          >
+        </div>
+        <button (click)="canjearPuntos()" class="btn btn-primary">
+          Canjear Puntos
+        </button>
+      </div>
+
+      <div *ngIf="mensaje" class="alert alert-success">
+        {{ mensaje }}
+      </div>
+      <div *ngIf="error" class="alert alert-danger">
+        {{ error }}
+      </div>
+    </div>
+  </div>
+</div>

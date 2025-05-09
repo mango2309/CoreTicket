@@ -1,0 +1,26 @@
+# ==== BACKEND (.NET Core) ====
+**/bin/
+**/obj/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Visual Studio
+.vs/
+*.db
+
+# ==== FRONTEND (Angular) ====
+frontend/ticket-parking/node_modules/
+frontend/ticket-parking/dist/
+frontend/ticket-parking/.angular/
+frontend/ticket-parking/.env
+frontend/ticket-parking/.vscode/
+
+# ==== SISTEMA ====
+.DS_Store
+Thumbs.db
+
+# ==== GIT ====
+# (Esto solo aplica si por error queda un .git en carpetas internas, como ya te pasó)
+frontend/ticket-parking/.git/

@@ -1,0 +1,13 @@
+<div *ngIf="resultado; else noResult">
+  <div class="card mt-4">
+    <div class="card-body">
+      <h5 class="card-title">Resultado del Ticket</h5>
+      <p><strong>Número:</strong> {{ resultado.numero }}</p>
+      <p><strong>Estado:</strong> {{ resultado.estado }}</p>
+      <p><strong>Fecha:</strong> {{ resultado.fecha }}</p>
+    </div>
+  </div>
+</div>
+<ng-template #noResult>
+  <div class="alert alert-info mt-4">Ingrese un número de ticket para ver el resultado.</div>
+</ng-template>
