@@ -19,13 +19,5 @@ namespace TicketParkingAPI.Models.DTO
         [MinLength(6)]
         public string PasswordHash { get; set; }
 
-        [Required]
-        public int PaisId { get; set; }
-
-        [Required]
-        public int ProvinciaId { get; set; }
-
-        [Required]
-        public int CiudadId { get; set; }
     }
 }

@@ -1,7 +1,10 @@
 export interface TicketQuery {
-    idTicket?: number;
-    ticketCode: string;
-    fechaConsulta: string; // ISO string: ej. new Date().toISOString()
-    estadoTicket: string;
-    idUsuario: number;
+  idTicket: number;
+  ticketCode: string;
+  fechaEntrada: Date;
+  fechaSalida?: Date;
+  estadoTicket: string;
+  idUsuario: number;
+  tiempoEstadia: number;
+  puntosLealtad: number;
   }

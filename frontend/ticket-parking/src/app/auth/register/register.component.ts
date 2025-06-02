@@ -1,9 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { UbicacionService } from '../../core/services/ubicacion.service';
 import { UsuarioService } from '../../core/services/usuario.service';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { AuthService } from '../../core/services/auth.service';
 
 @Component({
   selector: 'app-register',
@@ -16,12 +16,13 @@ export class RegisterComponent implements OnInit {
   paises: any[] = [];
   provincias: any[] = [];
   ciudades: any[] = [];
+  error: string = '';
 
   constructor(
     private fb: FormBuilder,
-    private ubicacionService: UbicacionService,
     private usuarioService: UsuarioService,
-    private router: Router
+    private router: Router,
+    private authService: AuthService
   ) {}
 
   ngOnInit() {
@@ -30,42 +31,26 @@ export class RegisterComponent implements OnInit {
       cedula: ['', [Validators.required, Validators.pattern('^[0-9]{10}$')]],
       email: ['', [Validators.required, Validators.email]],
       passwordHash: ['', [Validators.required, Validators.minLength(6)]],
-      paisId: ['', Validators.required],
-      provinciaId: ['', Validators.required],
-      ciudadId: ['', Validators.required]
     });
 
-    this.ubicacionService.getPaises().subscribe(data => {
-      this.paises = data;
-    });
-  }
-
-  onPaisChange() {
-    const paisId = this.registerForm.get('paisId')?.value;
-    if (paisId) {
-      this.ubicacionService.getProvincias(paisId).subscribe(data => {
-        this.provincias = data;
-        this.ciudades = [];
-        this.registerForm.patchValue({ provinciaId: '', ciudadId: '' });
-      });
-    }
-  }
-
-  onProvinciaChange() {
-    const provinciaId = this.registerForm.get('provinciaId')?.value;
-    if (provinciaId) {
-      this.ubicacionService.getCiudades(provinciaId).subscribe(data => {
-        this.ciudades = data;
-        this.registerForm.patchValue({ ciudadId: '' });
-      });
-    }
   }
 
   onSubmit() {
     if (this.registerForm.valid) {
-      this.usuarioService.crearUsuario(this.registerForm.value).subscribe(() => {
-        //alert('Usuario registrado exitosamente');
-        this.router.navigate(['/home']);
+      this.usuarioService.crearUsuario(this.registerForm.value).subscribe({
+        next: (response) => {
+          if (response && response.idUsuario) {
+            // Guardar el ID del usuario en el localStorage
+            this.authService.setUsuarioId(response.idUsuario);
+            this.router.navigate(['/home']);
+          } else {
+            this.error = 'Error al obtener el ID del usuario. Por favor, intente nuevamente.';
+          }
+        },
+        error: (error) => {
+          console.error('Error al registrar usuario:', error);
+          this.error = 'Error al registrar el usuario. Por favor, intente nuevamente.';
+        }
       });
     }
   }

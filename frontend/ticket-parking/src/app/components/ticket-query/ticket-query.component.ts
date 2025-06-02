@@ -29,11 +29,16 @@ import { TicketResultadoComponent } from '../ticket-resultado/ticket-resultado.c
         </div>
       </div>
 
-      <!-- Ticket info primero -->
-      <app-ticket-resultado *ngIf="ticket" [resultado]="ticket"></app-ticket-resultado>
+      <app-ticket-resultado 
+        *ngIf="ticket" 
+        [resultado]="ticket"
+        (ticketPagado)="onTicketPagado($event)">
+      </app-ticket-resultado>
 
-      <!-- Interfaz de lealtad después -->
-      <app-lealtad-puntos></app-lealtad-puntos>
+      <app-lealtad-puntos 
+        *ngIf="ticket"
+        [idUsuario]="ticket.idUsuario">
+      </app-lealtad-puntos>
     </div>
   `,
   styles: [`
@@ -72,5 +77,10 @@ export class TicketQueryComponent {
         }
       });
     }
+  }
+
+  onTicketPagado(ticketActualizado: TicketQuery) {
+    this.ticket = ticketActualizado;
+    this.ticketResult.emit(ticketActualizado);
   }
 }

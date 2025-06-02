@@ -7,29 +7,17 @@ import { Observable } from 'rxjs';
 export class LealtadService {
   private apiUrl = 'https://localhost:7251/api/lealtad';
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
-  getLealtades(): Observable<Lealtad[]> {
-    return this.http.get<Lealtad[]>(this.apiUrl);
+  getLoyaltyByUserId(userId: number): Observable<Lealtad> {
+    return this.http.get<Lealtad>(`${this.apiUrl}/usuario/${userId}`);
   }
 
-  getLealtadPorUsuario(usuarioId: number): Observable<Lealtad> {
-    return this.http.get<Lealtad>(`${this.apiUrl}/usuario/${usuarioId}`);
+  getAllLoyaltyRecords(): Observable<Lealtad[]> {
+    return this.http.get<Lealtad[]>(`${this.apiUrl}/todos`);
   }
 
-  crearLealtad(lealtad: Lealtad): Observable<Lealtad> {
-    return this.http.post<Lealtad>(this.apiUrl, lealtad);
-  }
-
-  actualizarLealtad(id: number, lealtad: Lealtad): Observable<void> {
-    return this.http.put<void>(`${this.apiUrl}/${id}`, lealtad);
-  }
-
-  getPuntosLealtad(usuarioId: number): Observable<any> {
-    return this.http.get(`${this.apiUrl}/puntos/${usuarioId}`);
-  }
-
-  canjearPuntos(usuarioId: number, puntos: number): Observable<any> {
-    return this.http.post(`${this.apiUrl}/canjear`, { usuarioId, puntos });
+  addPoints(loyalty: Partial<Lealtad>): Observable<any> {
+    return this.http.post(`${this.apiUrl}/agregar-puntos`, loyalty);
   }
 }

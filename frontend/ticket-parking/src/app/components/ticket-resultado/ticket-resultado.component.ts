@@ -1,5 +1,6 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 import { TicketService, TicketQuery } from '../../core/services/ticket.service';
 
 @Component({
@@ -16,19 +17,33 @@ import { TicketService, TicketQuery } from '../../core/services/ticket.service';
           <div class="row">
             <div class="col-md-6">
               <p><strong>Código:</strong> {{ resultado.ticketCode }}</p>
-              <p><strong>Estado:</strong> {{ resultado.estadoTicket }}</p>
+              <p><strong>Estado:</strong> 
+                <span [ngClass]="{
+                  'badge': true,
+                  'bg-success': resultado.estadoTicket === 'Pagado',
+                  'bg-warning': resultado.estadoTicket === 'No Pagado'
+                }">
+                  {{ resultado.estadoTicket }}
+                </span>
+              </p>
+              <p><strong>Tiempo de Estadia:</strong> {{ resultado.tiempoEstadia | number:'1.0-1' }} horas</p>
             </div>
             <div class="col-md-6">
-              <p><strong>Fecha de Consulta:</strong> {{ resultado.fechaConsulta | date:'medium' }}</p>
-              <p><strong>ID Usuario:</strong> {{ resultado.idUsuario }}</p>
+              <p><strong>Fecha de Entrada:</strong> {{ resultado.fechaEntrada | date:'medium' }}</p>
+              <p><strong>Fecha de Salida:</strong> {{ resultado.fechaSalida ? (resultado.fechaSalida | date:'medium') : 'No registrada' }}</p>
+              <p><strong>Puntos de Lealtad:</strong> {{ resultado.puntosLealtad }}</p>
             </div>
           </div>
           <div class="mt-3">
-            <button class="btn btn-danger me-2" (click)="eliminarTicket()">
-              Eliminar Ticket
+            <button *ngIf="resultado.estadoTicket === 'No Pagado'"
+                    class="btn btn-success me-2" 
+                    (click)="pagarTicket()">
+              Pagar Ticket
             </button>
-            <button class="btn btn-warning" (click)="cambiarEstado()">
-              Cambiar Estado
+            <button class="btn btn-danger" 
+                    (click)="eliminarTicket()"
+                    [disabled]="resultado.estadoTicket === 'Pagado'">
+              Eliminar Ticket
             </button>
           </div>
         </div>
@@ -43,13 +58,38 @@ import { TicketService, TicketQuery } from '../../core/services/ticket.service';
       max-width: 800px;
       margin: 0 auto;
     }
+    .badge {
+      padding: 0.5em 1em;
+      font-size: 0.85em;
+    }
   `]
 })
 export class TicketResultadoComponent {
   @Input() resultado: TicketQuery | null = null;
+  @Output() ticketPagado = new EventEmitter<TicketQuery>();
   error: string = '';
 
-  constructor(private ticketService: TicketService) {}
+  constructor(
+    private ticketService: TicketService,
+    private router: Router
+  ) {}
+
+  pagarTicket() {
+    if (this.resultado && confirm('¿Desea proceder con el pago del ticket?')) {
+      this.ticketService.payTicket(this.resultado.idTicket).subscribe({
+        next: (ticketActualizado) => {
+          this.resultado = ticketActualizado;
+          this.error = '';
+          this.ticketPagado.emit(ticketActualizado);
+          alert('Ticket pagado exitosamente');
+        },
+        error: (error) => {
+          console.error('Error al pagar el ticket:', error);
+          this.error = 'Error al procesar el pago del ticket';
+        }
+      });
+    }
+  }
 
   eliminarTicket() {
     if (this.resultado && confirm('¿Está seguro de que desea eliminar este ticket?')) {
@@ -62,25 +102,6 @@ export class TicketResultadoComponent {
         error: (error) => {
           console.error('Error al eliminar el ticket:', error);
           this.error = 'Error al eliminar el ticket';
-        }
-      });
-    }
-  }
-
-  cambiarEstado() {
-    if (this.resultado) {
-      const nuevoEstado = this.resultado.estadoTicket === 'Activo' ? 'Inactivo' : 'Activo';
-      const ticketActualizado = { ...this.resultado, estadoTicket: nuevoEstado };
-      
-      this.ticketService.updateTicket(this.resultado.idTicket, ticketActualizado).subscribe({
-        next: () => {
-          this.resultado = ticketActualizado;
-          this.error = '';
-          alert('Estado del ticket actualizado exitosamente');
-        },
-        error: (error) => {
-          console.error('Error al actualizar el ticket:', error);
-          this.error = 'Error al actualizar el estado del ticket';
         }
       });
     }

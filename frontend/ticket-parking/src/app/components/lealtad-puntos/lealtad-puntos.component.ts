@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { LealtadService } from '../../core/services/lealtad.service';
@@ -8,14 +8,59 @@ import { AuthService } from '../../core/services/auth.service';
   selector: 'app-lealtad-puntos',
   standalone: true,
   imports: [CommonModule, FormsModule],
-  templateUrl: './lealtad-puntos.component.html',
-  styleUrl: './lealtad-puntos.component.scss'
+  template: `
+    <div class="card mt-4">
+      <div class="card-header bg-info text-white">
+        <h5 class="mb-0">Puntos de Lealtad</h5>
+      </div>
+      <div class="card-body">
+        <div *ngIf="loading" class="text-center">
+          <div class="spinner-border" role="status">
+            <span class="visually-hidden">Cargando...</span>
+          </div>
+        </div>
+
+        <div *ngIf="error" class="alert alert-danger">
+          {{ error }}
+        </div>
+
+        <div *ngIf="!idUsuario" class="alert alert-warning">
+          No hay un usuario seleccionado para mostrar los puntos de lealtad.
+        </div>
+
+        <div *ngIf="lealtad && !loading && !error" class="loyalty-info">
+          <div class="row">
+            <div class="col-md-6">
+              <p><strong>Puntos Acumulados:</strong> {{ lealtad.puntosAcumulados }}</p>
+              <p><strong>Horas Acumuladas:</strong> {{ lealtad.horasAcumuladas | number:'1.0-1' }}</p>
+            </div>
+            <div class="col-md-6">
+              <p><strong>Última Actualización:</strong> {{ lealtad.ultimaActualizacion | date:'medium' }}</p>
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="!lealtad && !loading && !error && idUsuario" class="alert alert-info">
+          Este usuario aún no tiene puntos de lealtad acumulados.
+        </div>
+      </div>
+    </div>
+  `,
+  styles: [`
+    .card {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    .loyalty-info {
+      padding: 1rem 0;
+    }
+  `]
 })
 export class LealtadPuntosComponent implements OnInit {
-  puntosDisponibles: number = 0;
-  puntosACanjear: number = 0;
-  mensaje: string = '';
-  error: string = '';
+  @Input() idUsuario!: number;
+  lealtad: any = null;
+  loading = false;
+  error = '';
 
   constructor(
     private lealtadService: LealtadService,
@@ -23,49 +68,29 @@ export class LealtadPuntosComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.cargarPuntosLealtad();
+    if (this.idUsuario) {
+      this.cargarPuntosLealtad();
+    }
   }
 
   cargarPuntosLealtad() {
-    const usuarioId = this.authService.getUsuarioId();
-    if (usuarioId) {
-      this.lealtadService.getPuntosLealtad(usuarioId).subscribe({
-        next: (response) => {
-          this.puntosDisponibles = response.puntos;
-        },
-        error: (error) => {
-          this.error = 'Error al cargar los puntos de lealtad';
-          console.error('Error:', error);
+    this.loading = true;
+    this.error = '';
+
+    this.lealtadService.getLoyaltyByUserId(this.idUsuario).subscribe({
+      next: (data) => {
+        this.lealtad = data;
+        this.loading = false;
+      },
+      error: (err) => {
+        console.error('Error al cargar puntos de lealtad:', err);
+        if (err.status === 404) {
+          this.error = 'Este usuario aún no tiene puntos de lealtad acumulados.';
+        } else {
+          this.error = 'Error al cargar los puntos de lealtad. Por favor, intente nuevamente.';
         }
-      });
-    }
-  }
-
-  canjearPuntos() {
-    if (this.puntosACanjear <= 0) {
-      this.error = 'Debe ingresar una cantidad válida de puntos';
-      return;
-    }
-
-    if (this.puntosACanjear > this.puntosDisponibles) {
-      this.error = 'No tiene suficientes puntos disponibles';
-      return;
-    }
-
-    const usuarioId = this.authService.getUsuarioId();
-    if (usuarioId) {
-      this.lealtadService.canjearPuntos(usuarioId, this.puntosACanjear).subscribe({
-        next: (response) => {
-          this.mensaje = 'Puntos canjeados exitosamente';
-          this.error = '';
-          this.puntosACanjear = 0;
-          this.cargarPuntosLealtad();
-        },
-        error: (error) => {
-          this.error = 'Error al canjear los puntos';
-          console.error('Error:', error);
-        }
-      });
-    }
+        this.loading = false;
+      }
+    });
   }
 }

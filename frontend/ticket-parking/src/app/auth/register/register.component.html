@@ -83,76 +83,16 @@
               </div>
             </div>
 
-            <div class="mb-4">
-              <label for="pais" class="form-label fw-bold">País:</label>
-              <select 
-                id="pais"
-                formControlName="paisId" 
-                (change)="onPaisChange()"
-                class="form-select form-select-lg"
-                [ngClass]="{'is-invalid': registerForm.get('paisId')?.invalid && registerForm.get('paisId')?.touched}"
-                [attr.aria-invalid]="registerForm.get('paisId')?.invalid"
-                [attr.aria-describedby]="registerForm.get('paisId')?.invalid ? 'pais-error' : null"
-              >
-                <option value="">Seleccione un país</option>
-                <option *ngFor="let pais of paises" [value]="pais.id">{{ pais.nombre }}</option>
-              </select>
-              <div *ngIf="registerForm.get('paisId')?.invalid && registerForm.get('paisId')?.touched" 
-                   id="pais-error" 
-                   class="invalid-feedback">
-                Seleccione un país
-              </div>
-            </div>
-
-            <div class="mb-4">
-              <label for="provincia" class="form-label fw-bold">Provincia:</label>
-              <select 
-                id="provincia"
-                formControlName="provinciaId" 
-                (change)="onProvinciaChange()"
-                class="form-select form-select-lg"
-                [ngClass]="{'is-invalid': registerForm.get('provinciaId')?.invalid && registerForm.get('provinciaId')?.touched}"
-                [attr.aria-invalid]="registerForm.get('provinciaId')?.invalid"
-                [attr.aria-describedby]="registerForm.get('provinciaId')?.invalid ? 'provincia-error' : null"
-                [disabled]="!registerForm.get('paisId')?.value"
-              >
-                <option value="">Seleccione una provincia</option>
-                <option *ngFor="let provincia of provincias" [value]="provincia.id">{{ provincia.nombre }}</option>
-              </select>
-              <div *ngIf="registerForm.get('provinciaId')?.invalid && registerForm.get('provinciaId')?.touched" 
-                   id="provincia-error" 
-                   class="invalid-feedback">
-                Seleccione una provincia
-              </div>
-            </div>
-
-            <div class="mb-4">
-              <label for="ciudad" class="form-label fw-bold">Ciudad:</label>
-              <select 
-                id="ciudad"
-                formControlName="ciudadId"
-                class="form-select form-select-lg"
-                [ngClass]="{'is-invalid': registerForm.get('ciudadId')?.invalid && registerForm.get('ciudadId')?.touched}"
-                [attr.aria-invalid]="registerForm.get('ciudadId')?.invalid"
-                [attr.aria-describedby]="registerForm.get('ciudadId')?.invalid ? 'ciudad-error' : null"
-                [disabled]="!registerForm.get('provinciaId')?.value"
-              >
-                <option value="">Seleccione una ciudad</option>
-                <option *ngFor="let ciudad of ciudades" [value]="ciudad.id">{{ ciudad.nombre }}</option>
-              </select>
-              <div *ngIf="registerForm.get('ciudadId')?.invalid && registerForm.get('ciudadId')?.touched" 
-                   id="ciudad-error" 
-                   class="invalid-feedback">
-                Seleccione una ciudad
-              </div>
-            </div>
-
             <div class="d-grid gap-2 mt-5">
               <button type="submit" 
                       class="btn btn-primary btn-lg" 
                       [disabled]="registerForm.invalid">
                 Registrarse
               </button>
+            </div>
+
+            <div *ngIf="error" class="alert alert-danger mt-3">
+              {{ error }}
             </div>
           </form>
         </div>

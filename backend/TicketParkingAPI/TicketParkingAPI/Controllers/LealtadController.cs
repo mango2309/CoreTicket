@@ -18,14 +18,14 @@ namespace TicketParkingAPI.Controllers
         }
 
         // GET: api/Lealtad/usuario/5
-        [HttpGet("usuario/{usuarioId}")]
-        public async Task<ActionResult<LealtadDto>> GetLealtadPorUsuario(int usuarioId)
+        [HttpGet("usuario/{idUsuario}")]
+        public async Task<ActionResult<LealtadDto>> GetLealtadPorUsuario(int idUsuario)
         {
-            var lealtad = await _context.Lealtad.FirstOrDefaultAsync(l => l.UsuarioId == usuarioId);
+            var lealtad = await _context.Lealtad.FirstOrDefaultAsync(l => l.UsuarioId == idUsuario);
 
             if (lealtad == null)
             {
-                return NotFound();
+                return NotFound($"No se encontró información de lealtad para el usuario con ID {idUsuario}");
             }
 
             return new LealtadDto
@@ -41,10 +41,23 @@ namespace TicketParkingAPI.Controllers
         [HttpPost("agregar-puntos")]
         public async Task<ActionResult> AgregarPuntos([FromBody] LealtadDto dto)
         {
+            if (dto == null)
+            {
+                return BadRequest("Los datos de lealtad son requeridos");
+            }
+
+            // Verificar que el usuario existe
+            var usuarioExiste = await _context.Usuarios.AnyAsync(u => u.IdUsuario == dto.UsuarioId);
+            if (!usuarioExiste)
+            {
+                return NotFound($"No se encontró el usuario con ID {dto.UsuarioId}");
+            }
+
             var lealtad = await _context.Lealtad.FirstOrDefaultAsync(l => l.UsuarioId == dto.UsuarioId);
 
             if (lealtad == null)
             {
+                // Crear nuevo registro de lealtad
                 lealtad = new Lealtad
                 {
                     UsuarioId = dto.UsuarioId,
@@ -56,6 +69,7 @@ namespace TicketParkingAPI.Controllers
             }
             else
             {
+                // Actualizar registro existente
                 lealtad.PuntosAcumulados += dto.PuntosAcumulados;
                 lealtad.HorasAcumuladas += dto.HorasAcumuladas;
                 lealtad.UltimaActualizacion = DateTime.Now;
@@ -63,24 +77,31 @@ namespace TicketParkingAPI.Controllers
             }
 
             await _context.SaveChangesAsync();
-            return Ok();
+
+            return Ok(new
+            {
+                mensaje = "Puntos agregados exitosamente",
+                usuarioId = dto.UsuarioId,
+                puntosAcumulados = lealtad.PuntosAcumulados,
+                horasAcumuladas = lealtad.HorasAcumuladas
+            });
         }
 
-        // POST: api/Lealtad/resetear
-        [HttpPost("resetear")]
-        public async Task<ActionResult> ResetearLealtad(int usuarioId)
+        // GET: api/Lealtad/todos
+        [HttpGet("todos")]
+        public async Task<ActionResult<IEnumerable<LealtadDto>>> GetTodosLosRegistrosLealtad()
         {
-            var lealtad = await _context.Lealtad.FirstOrDefaultAsync(l => l.UsuarioId == usuarioId);
-            if (lealtad == null) return NotFound();
+            var registrosLealtad = await _context.Lealtad
+                .Select(l => new LealtadDto
+                {
+                    UsuarioId = l.UsuarioId,
+                    PuntosAcumulados = l.PuntosAcumulados,
+                    HorasAcumuladas = l.HorasAcumuladas,
+                    UltimaActualizacion = l.UltimaActualizacion
+                })
+                .ToListAsync();
 
-            lealtad.PuntosAcumulados = 0;
-            lealtad.HorasAcumuladas = 0;
-            lealtad.UltimaActualizacion = DateTime.Now;
-
-            _context.Lealtad.Update(lealtad);
-            await _context.SaveChangesAsync();
-
-            return Ok();
+            return Ok(registrosLealtad);
         }
     }
 }

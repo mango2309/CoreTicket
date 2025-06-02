@@ -1,6 +1,6 @@
 export interface Lealtad {
-    idLealtad?: number;
-    usuarioId: number;
-    puntos: number;
-    tiempoUso: number;
+  usuarioId: number;
+  puntosAcumulados: number;
+  horasAcumuladas: number;
+  ultimaActualizacion: Date;
   }

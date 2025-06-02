@@ -6,16 +6,19 @@ import { catchError, retry } from 'rxjs/operators';
 export interface TicketQuery {
   idTicket: number;
   ticketCode: string;
-  fechaConsulta: Date;
+  fechaEntrada: Date;
+  fechaSalida?: Date;
   estadoTicket: string;
   idUsuario: number;
+  tiempoEstadia: number;
+  puntosLealtad: number;
 }
 
 @Injectable({
   providedIn: 'root'
 })
 export class TicketService {
-  private apiUrl = 'https://localhost:7251/api';
+  private apiUrl = 'https://localhost:7251/api/TicketQuery';
   private httpOptions = {
     headers: new HttpHeaders({
       'Content-Type': 'application/json',
@@ -25,25 +28,46 @@ export class TicketService {
 
   constructor(private http: HttpClient) {}
 
-  getTicketByCode(ticketCode: string): Observable<TicketQuery> {
-    console.log('Intentando buscar ticket con código:', ticketCode);
-    console.log('URL de la petición:', `${this.apiUrl}/TicketQuery/code/${ticketCode}`);
-    
-    return this.http.get<TicketQuery>(`${this.apiUrl}/TicketQuery/code/${ticketCode}`, this.httpOptions).pipe(
+  // Obtener todos los tickets
+  getTickets(): Observable<TicketQuery[]> {
+    return this.http.get<TicketQuery[]>(this.apiUrl, this.httpOptions).pipe(
       retry(1),
       catchError(this.handleError)
     );
   }
 
-  deleteTicket(id: number): Observable<any> {
-    return this.http.delete(`${this.apiUrl}/TicketQuery/${id}`, this.httpOptions).pipe(
+  // Obtener ticket por código
+  getTicketByCode(code: string): Observable<TicketQuery> {
+    return this.http.get<TicketQuery>(`${this.apiUrl}/code/${code}`);
+  }
+
+  // Crear nuevo ticket
+  createTicket(ticket: Partial<TicketQuery>): Observable<TicketQuery> {
+    return this.http.post<TicketQuery>(this.apiUrl, ticket, this.httpOptions).pipe(
       retry(1),
       catchError(this.handleError)
     );
   }
 
-  updateTicket(id: number, ticket: TicketQuery): Observable<TicketQuery> {
-    return this.http.put<TicketQuery>(`${this.apiUrl}/TicketQuery/${id}`, ticket, this.httpOptions).pipe(
+  // Actualizar ticket
+  updateTicket(id: number, ticket: Partial<TicketQuery>): Observable<TicketQuery> {
+    return this.http.put<TicketQuery>(`${this.apiUrl}/${id}`, ticket, this.httpOptions).pipe(
+      retry(1),
+      catchError(this.handleError)
+    );
+  }
+
+  // Eliminar ticket
+  deleteTicket(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${id}`, this.httpOptions).pipe(
+      retry(1),
+      catchError(this.handleError)
+    );
+  }
+
+  // Pagar ticket
+  payTicket(id: number): Observable<TicketQuery> {
+    return this.http.put<TicketQuery>(`${this.apiUrl}/${id}/pagar`, {}, this.httpOptions).pipe(
       retry(1),
       catchError(this.handleError)
     );
@@ -78,4 +102,4 @@ export class TicketService {
 
     return throwError(() => new Error(errorMessage));
   }
-} 
+}

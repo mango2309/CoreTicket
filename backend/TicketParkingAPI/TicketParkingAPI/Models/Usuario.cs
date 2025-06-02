@@ -10,14 +10,5 @@ namespace TicketParkingAPI.Models
         public string Email { get; set; }
         public string PasswordHash { get; set; }
 
-        // Relaciones foráneas
-        public int PaisId { get; set; }
-        public Pais Pais { get; set; }
-
-        public int ProvinciaId { get; set; }
-        public Provincia Provincia { get; set; }
-
-        public int CiudadId { get; set; }
-        public Ciudad Ciudad { get; set; }
     }
 }

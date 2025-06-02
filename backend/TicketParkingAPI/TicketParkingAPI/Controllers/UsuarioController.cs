@@ -32,10 +32,7 @@ namespace TicketParkingAPI.Controllers
             {
                 Cedula = dto.Cedula,
                 Email = dto.Email,
-                PasswordHash = dto.PasswordHash,
-                PaisId = dto.PaisId,
-                ProvinciaId = dto.ProvinciaId,
-                CiudadId = dto.CiudadId
+                PasswordHash = dto.PasswordHash
             };
 
             _context.Usuarios.Add(nuevoUsuario);
