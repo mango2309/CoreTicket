@@ -12,8 +12,8 @@ using TicketParkingAPI.Data;
 namespace TicketParkingAPI.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250601220612_Cambiosbdd")]
-    partial class Cambiosbdd
+    [Migration("20250604055143_CambiosBeneficios")]
+    partial class CambiosBeneficios
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,6 +24,72 @@ namespace TicketParkingAPI.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+
+            modelBuilder.Entity("TicketParkingAPI.Models.BeneficioLealtad", b =>
+                {
+                    b.Property<int>("IdBeneficio")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("IdBeneficio"));
+
+                    b.Property<bool>("Activo")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Descripcion")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<DateTime>("FechaCreacion")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("IdLealtad")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Nombre")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<int>("PuntosRequeridos")
+                        .HasColumnType("int");
+
+                    b.HasKey("IdBeneficio");
+
+                    b.HasIndex("IdLealtad");
+
+                    b.ToTable("BeneficiosLealtad");
+
+                    b.HasData(
+                        new
+                        {
+                            IdBeneficio = 1,
+                            Activo = true,
+                            Descripcion = "Lavado completo de vehículo gratis",
+                            FechaCreacion = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Nombre = "Lavado Gratis",
+                            PuntosRequeridos = 1
+                        },
+                        new
+                        {
+                            IdBeneficio = 2,
+                            Activo = true,
+                            Descripcion = "30 minutos de parqueo gratis",
+                            FechaCreacion = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Nombre = "30 Minutos Gratis",
+                            PuntosRequeridos = 2
+                        },
+                        new
+                        {
+                            IdBeneficio = 3,
+                            Activo = true,
+                            Descripcion = "1 hora de parqueo gratis",
+                            FechaCreacion = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Nombre = "1 Hora Gratis",
+                            PuntosRequeridos = 3
+                        });
+                });
 
             modelBuilder.Entity("TicketParkingAPI.Models.Lealtad", b =>
                 {
@@ -111,6 +177,15 @@ namespace TicketParkingAPI.Migrations
                     b.HasKey("IdUsuario");
 
                     b.ToTable("Usuarios");
+                });
+
+            modelBuilder.Entity("TicketParkingAPI.Models.BeneficioLealtad", b =>
+                {
+                    b.HasOne("TicketParkingAPI.Models.Lealtad", "Lealtad")
+                        .WithMany()
+                        .HasForeignKey("IdLealtad");
+
+                    b.Navigation("Lealtad");
                 });
 
             modelBuilder.Entity("TicketParkingAPI.Models.Lealtad", b =>

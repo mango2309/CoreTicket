@@ -1,0 +1,72 @@
+.ticket-header {
+  background: linear-gradient(135deg, #000, #333);
+  color: #fff;
+  padding: 1rem 1.5rem;
+  border-radius: 12px 12px 0 0;
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+.card-header.ticket-info-header {
+  background: linear-gradient(135deg, #ff9800, #f44336);
+  color: #fff;
+  font-family: 'Inter', sans-serif;
+  text-align: left;
+  border-radius: 12px 12px 0 0;
+}
+
+.card-header.loyalty-header {
+  background: linear-gradient(135deg, #43ea5e, #b6ff49);
+  color: #fff;
+  font-family: 'Inter', sans-serif;
+  text-align: left;
+  border-radius: 12px 12px 0 0;
+}
+
+:host {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background-image: url('/assets/images/background-home.jpeg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  position: relative;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1;
+  }
+}
+
+.card, .ticket-info, .loyalty-info {
+  background: rgba(255,255,255,0.97);
+  border-radius: 12px;
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.10);
+  padding: 2rem;
+  margin-bottom: 2rem;
+}
+
+.card-header, .ticket-header {
+  background: linear-gradient(135deg, #000, #333);
+  color: #fff;
+  font-family: 'Inter', sans-serif;
+  text-align: center;
+  border-radius: 15px 15px 0 0;
+}
+
+.card {
+  font-family: 'Inter', sans-serif;
+}
+
+.card-title, .btn, .card-text {
+  font-family: 'Inter', sans-serif;
+}

@@ -1,7 +1,9 @@
 <div *ngIf="resultado; else noResult">
-  <div class="card mt-4">
-    <div class="card-body">
-      <h5 class="card-title">Resultado del Ticket</h5>
+  <div class="card mt-4 ticket-resultado-card">
+    <div class="card-header ticket-resultado-header">
+      <h5>Resultado del Ticket</h5>
+    </div>
+    <div class="card-body ticket-resultado-body">
       <p><strong>Número:</strong> {{ resultado.numero }}</p>
       <p><strong>Estado:</strong> {{ resultado.estado }}</p>
       <p><strong>Fecha:</strong> {{ resultado.fecha }}</p>

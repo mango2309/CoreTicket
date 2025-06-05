@@ -1,13 +1,14 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router';
 import { LealtadService } from '../../core/services/lealtad.service';
 import { AuthService } from '../../core/services/auth.service';
 
 @Component({
   selector: 'app-lealtad-puntos',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterModule],
   template: `
     <div class="card mt-4">
       <div class="card-header bg-info text-white">
@@ -38,6 +39,11 @@ import { AuthService } from '../../core/services/auth.service';
               <p><strong>Última Actualización:</strong> {{ lealtad.ultimaActualizacion | date:'medium' }}</p>
             </div>
           </div>
+          <div class="text-center mt-3">
+            <button class="btn btn-primary" [routerLink]="['/beneficios-lealtad']">
+              Ver Beneficios Disponibles
+            </button>
+          </div>
         </div>
 
         <div *ngIf="!lealtad && !loading && !error && idUsuario" class="alert alert-info">
@@ -53,6 +59,14 @@ import { AuthService } from '../../core/services/auth.service';
     }
     .loyalty-info {
       padding: 1rem 0;
+    }
+    .btn-primary {
+      background-color: #0d6efd;
+      border-color: #0d6efd;
+      &:hover {
+        background-color: #0b5ed7;
+        border-color: #0a58ca;
+      }
     }
   `]
 })

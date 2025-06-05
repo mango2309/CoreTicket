@@ -40,11 +40,6 @@ import { TicketService, TicketQuery } from '../../core/services/ticket.service';
                     (click)="pagarTicket()">
               Pagar Ticket
             </button>
-            <button class="btn btn-danger" 
-                    (click)="eliminarTicket()"
-                    [disabled]="resultado.estadoTicket === 'Pagado'">
-              Eliminar Ticket
-            </button>
           </div>
         </div>
       </div>

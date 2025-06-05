@@ -1,0 +1,15 @@
+.card-header, .ticket-resultado-header {
+  background: linear-gradient(135deg, #ff9800, #f44336);
+  color: #fff;
+  font-family: 'Inter', sans-serif;
+  text-align: center;
+  border-radius: 12px 12px 0 0;
+}
+
+.card, .ticket-resultado-card {
+  font-family: 'Inter', sans-serif;
+}
+
+.card-title, .btn, .card-text, .ticket-resultado-body {
+  font-family: 'Inter', sans-serif;
+}

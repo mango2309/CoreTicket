@@ -11,7 +11,7 @@ namespace TicketParkingAPI.Controllers
     public class TicketQueryController : ControllerBase
     {
         private readonly AppDbContext _context;
-        private const decimal PUNTOS_POR_HORA = 10; // Puntos de lealtad por hora
+        private const decimal PUNTOS_POR_HORA = 10; 
 
         public TicketQueryController(AppDbContext context)
         {
@@ -50,16 +50,15 @@ namespace TicketParkingAPI.Controllers
             }).ToList();
         }
 
-        // GET: api/TicketQuery/code/{ticketCode}
-        [HttpGet("code/{ticketCode}")]
-        public async Task<ActionResult<TicketQueryDto>> GetTicketByCode(string ticketCode)
+        [HttpGet("usuario/{usuarioId}")]
+        public async Task<ActionResult<TicketQueryDto>> GetTicketActivoUsuario(int usuarioId)
         {
             var ticket = await _context.TicketQueries
-                .FirstOrDefaultAsync(t => t.TicketCode == ticketCode);
+                .FirstOrDefaultAsync(t => t.IdUsuario == usuarioId && t.EstadoTicket == "No Pagado");
 
             if (ticket == null)
             {
-                return NotFound($"No se encontró el ticket con código {ticketCode}");
+                return NotFound($"No se encontró un ticket activo para el usuario {usuarioId}");
             }
 
             var tiempoEstadia = CalcularHorasEstadia(ticket.FechaEntrada, ticket.FechaSalida);
@@ -81,6 +80,22 @@ namespace TicketParkingAPI.Controllers
         [HttpPost]
         public async Task<ActionResult<TicketQueryDto>> PostTicketQuery(TicketQueryDto dto)
         {
+            // Verificar si el usuario existe
+            var usuario = await _context.Usuarios.FindAsync(dto.IdUsuario);
+            if (usuario == null)
+            {
+                return BadRequest($"No existe un usuario con ID {dto.IdUsuario}");
+            }
+
+            // Verificar si el usuario ya tiene un ticket activo
+            var ticketActivo = await _context.TicketQueries
+                .FirstOrDefaultAsync(t => t.IdUsuario == dto.IdUsuario && t.EstadoTicket == "No Pagado");
+
+            if (ticketActivo != null)
+            {
+                return BadRequest($"El usuario {dto.IdUsuario} ya tiene un ticket activo");
+            }
+
             var ticket = new TicketQuery
             {
                 TicketCode = dto.TicketCode,

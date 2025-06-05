@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Usuario } from '../models/usuario.model';
-import { Observable } from 'rxjs';
+import { Observable, tap } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class UsuarioService {
@@ -27,5 +27,15 @@ export class UsuarioService {
 
   eliminarUsuario(id: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${id}`);
+  }
+
+  login(credenciales: { email: string; passwordHash: string }): Observable<Usuario> {
+    console.log('Enviando credenciales:', credenciales);
+    return this.http.post<Usuario>(`${this.apiUrl}/login`, credenciales).pipe(
+      tap({
+        next: (response) => console.log('Respuesta del servidor:', response),
+        error: (error) => console.error('Error en la petición:', error)
+      })
+    );
   }
 }

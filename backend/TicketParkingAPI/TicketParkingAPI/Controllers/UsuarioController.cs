@@ -6,8 +6,8 @@ using TicketParkingAPI.Models.DTO;
 
 namespace TicketParkingAPI.Controllers
 {
-    [ApiController]
     [Route("api/[controller]")]
+    [ApiController]
     public class UsuarioController : ControllerBase
     {
         private readonly AppDbContext _context;
@@ -22,7 +22,6 @@ namespace TicketParkingAPI.Controllers
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
-
 
             var cedulaExiste = await _context.Usuarios.AnyAsync(u => u.Cedula == dto.Cedula);
             if (cedulaExiste)
@@ -67,6 +66,34 @@ namespace TicketParkingAPI.Controllers
             await _context.SaveChangesAsync();
 
             return Ok($"Usuario con ID {id} eliminado exitosamente.");
+        }
+
+        [HttpPost("login")]
+        public async Task<ActionResult<Usuario>> Login([FromBody] LoginRequestDto request)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var usuario = await _context.Usuarios
+                .FirstOrDefaultAsync(u => u.Email == request.Email && u.PasswordHash == request.PasswordHash);
+
+            if (usuario == null)
+            {
+                return Unauthorized("Credenciales inválidas.");
+            }
+
+            return Ok(usuario);
+        }
+
+        [HttpGet("{id}")]
+        public async Task<ActionResult<Usuario>> GetUsuarioById(int id)
+        {
+            var usuario = await _context.Usuarios.FindAsync(id);
+            if (usuario == null)
+                return NotFound();
+            return usuario;
         }
     }
 }

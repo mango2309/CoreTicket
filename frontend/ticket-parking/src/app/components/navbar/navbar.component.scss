@@ -1,0 +1,14 @@
+.navbar {
+  background: linear-gradient(90deg, #000, #333) !important;
+  font-family: 'Inter', sans-serif;
+}
+
+.navbar-brand, .nav-link {
+  color: #fff !important;
+  font-family: 'Inter', sans-serif;
+}
+
+.nav-link.active {
+  font-weight: 600;
+  text-decoration: underline;
+}

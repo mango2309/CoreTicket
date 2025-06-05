@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace TicketParkingAPI.Models
 {
@@ -12,6 +13,8 @@ namespace TicketParkingAPI.Models
         public string EstadoTicket { get; set; } = "No Pagado";
         public int IdUsuario { get; set; }
         public int PuntosLealtad { get; set; }
+
+        [Column(TypeName = "decimal(18,2)")]
         public decimal TiempoEstadia { get; set; }
     }
 }

@@ -1,0 +1,125 @@
+// Estilos para el contenedor principal
+:host {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    background-image: url('/assets/images/background-login.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    position: relative;
+  
+    // Overlay oscuro para mejorar la legibilidad
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(0, 0, 0, 0.5);
+      z-index: 1;
+    }
+  }
+  
+  // Contenedor principal
+  .container {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    max-width: 500px;
+    padding: 0;
+  }
+  
+  // Estilos para la tarjeta
+  .card {
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+    border-radius: 15px;
+    overflow: hidden;
+    background-color: rgba(255, 255, 255, 0.97);
+    margin-top: 2rem;
+    font-family: 'Inter', sans-serif;
+  }
+  
+  // Estilos para los inputs
+  .form-control {
+    border-radius: 8px;
+    border: 1px solid #ced4da;
+    padding: 1rem;
+    font-size: 1.1rem;
+    font-family: 'Inter', sans-serif;
+  }
+  
+  .form-label {
+    color: #222;
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    font-family: 'Inter', sans-serif;
+  }
+
+  .btn-primary {
+    padding: 0.75rem 1.5rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease;
+    font-family: 'Inter', sans-serif;
+  
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(42, 230, 5, 0.1);
+    }
+  
+    &:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+    }
+  }
+  
+  // Estilos para el mensaje de error
+  .alert-danger {
+    border-radius: 8px;
+    background-color: rgba(220, 53, 69, 0.1);
+    border: 1px solid rgba(220, 53, 69, 0.2);
+    color: #dc3545;
+  }
+  
+  // Estilos para el enlace de registro
+  a {
+    color: #007bff;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s ease;
+    font-family: 'Inter', sans-serif;
+  
+    &:hover {
+      color: #0056b3;
+      text-decoration: underline;
+    }
+  }
+  
+  // Estilos responsivos
+  @media (max-width: 768px) {
+    .container {
+      padding-top: 1rem;
+      padding-bottom: 1rem;
+    }
+  
+    .card {
+      margin: 1rem;
+    }
+  
+    .card-header h2 {
+      font-size: 1.5rem;
+    }
+  }
+
+  .card-header {
+    background: linear-gradient(135deg, #000, #333);
+    color: #fff;
+    font-family: 'Inter', sans-serif;
+    text-align: center;
+    border-radius: 15px 15px 0 0;
+  }

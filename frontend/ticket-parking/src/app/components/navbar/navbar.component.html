@@ -17,5 +17,11 @@
         </li>
       </ul>
     </div>
+    <div *ngIf="usuarioActual" class="d-flex align-items-center ms-3">
+      <span class="text-white small">
+        <i class="bi bi-person-circle"></i>
+        {{ usuarioActual.nombre || usuarioActual.email }} (ID: {{ usuarioActual.idUsuario }})
+      </span>
+    </div>
   </div>
 </nav>
