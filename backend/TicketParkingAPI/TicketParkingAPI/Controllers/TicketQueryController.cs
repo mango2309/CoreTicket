@@ -3,6 +3,7 @@ using TicketParkingAPI.Models.DTO;
 using TicketParkingAPI.Models;
 using TicketParkingAPI.Data;
 using Microsoft.EntityFrameworkCore;
+using TicketParkingAPI.Services;
 
 namespace TicketParkingAPI.Controllers
 {
@@ -11,11 +12,12 @@ namespace TicketParkingAPI.Controllers
     public class TicketQueryController : ControllerBase
     {
         private readonly AppDbContext _context;
-        private const decimal PUNTOS_POR_HORA = 10; 
+        private readonly IPuntosLealtadService _puntosLealtadService;
 
-        public TicketQueryController(AppDbContext context)
+        public TicketQueryController(AppDbContext context, IPuntosLealtadService puntosLealtadService)
         {
             _context = context;
+            _puntosLealtadService = puntosLealtadService;
         }
 
         private decimal CalcularHorasEstadia(DateTime fechaEntrada, DateTime? fechaSalida)
@@ -27,16 +29,10 @@ namespace TicketParkingAPI.Controllers
             return (decimal)(fechaSalida.Value - fechaEntrada).TotalHours;
         }
 
-        private int CalcularPuntosLealtad(decimal horas)
-        {
-            return (int)(horas * PUNTOS_POR_HORA);
-        }
-
         [HttpGet]
         public async Task<ActionResult<IEnumerable<TicketQueryDto>>> GetTicketQueries()
         {
             var tickets = await _context.TicketQueries.ToListAsync();
-            
             return tickets.Select(t => new TicketQueryDto
             {
                 IdTicket = t.IdTicket,
@@ -46,7 +42,7 @@ namespace TicketParkingAPI.Controllers
                 EstadoTicket = t.EstadoTicket,
                 IdUsuario = t.IdUsuario,
                 TiempoEstadia = CalcularHorasEstadia(t.FechaEntrada, t.FechaSalida),
-                PuntosLealtad = CalcularPuntosLealtad(CalcularHorasEstadia(t.FechaEntrada, t.FechaSalida))
+                PuntosLealtad = _puntosLealtadService.CalcularPuntos("hora", CalcularHorasEstadia(t.FechaEntrada, t.FechaSalida))
             }).ToList();
         }
 
@@ -62,7 +58,7 @@ namespace TicketParkingAPI.Controllers
             }
 
             var tiempoEstadia = CalcularHorasEstadia(ticket.FechaEntrada, ticket.FechaSalida);
-            var puntosLealtad = CalcularPuntosLealtad(tiempoEstadia);
+            var puntosLealtad = _puntosLealtadService.CalcularPuntos("hora", tiempoEstadia);
 
             return new TicketQueryDto
             {
@@ -203,7 +199,7 @@ namespace TicketParkingAPI.Controllers
             ticket.FechaSalida = DateTime.UtcNow;
 
             var horasEstadia = CalcularHorasEstadia(ticket.FechaEntrada, ticket.FechaSalida);
-            var puntosLealtad = CalcularPuntosLealtad(horasEstadia);
+            var puntosLealtad = _puntosLealtadService.CalcularPuntos("hora", horasEstadia);
 
             var lealtad = await _context.Lealtad.FirstOrDefaultAsync(l => l.UsuarioId == ticket.IdUsuario);
             if (lealtad == null)

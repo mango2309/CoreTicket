@@ -12,11 +12,11 @@ export interface Usuario {
 
 @Injectable({ providedIn: 'root' })
 export class UserService {
-  private apiUrl = 'https://localhost:7251/api/Usuario';
+  private apiUrl = 'http://localhost:5062/api/Usuario';
 
   constructor(private http: HttpClient) {}
 
   getUsuarioById(id: number): Observable<Usuario> {
     return this.http.get<Usuario>(`${this.apiUrl}/${id}`);
   }
-} 
+}

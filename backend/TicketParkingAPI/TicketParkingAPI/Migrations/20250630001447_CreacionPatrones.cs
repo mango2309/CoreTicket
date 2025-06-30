@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace TicketParkingAPI.Migrations
 {
     /// <inheritdoc />
-    public partial class CambiosBeneficios : Migration
+    public partial class CreacionPatrones : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

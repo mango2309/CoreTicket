@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using TicketParkingAPI.Data;
+using TicketParkingAPI.Services; // Agregado para el servicio de puntos de lealtad
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,6 +21,8 @@ builder.Services.AddCors(options =>
             .AllowAnyMethod()
             .AllowAnyHeader());
 });
+
+builder.Services.AddScoped<IPuntosLealtadService, PuntosLealtadService>(); // Registro del servicio de puntos de lealtad
 
 var app = builder.Build();
 

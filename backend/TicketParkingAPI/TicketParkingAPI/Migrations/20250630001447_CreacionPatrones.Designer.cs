@@ -12,8 +12,8 @@ using TicketParkingAPI.Data;
 namespace TicketParkingAPI.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250604055143_CambiosBeneficios")]
-    partial class CambiosBeneficios
+    [Migration("20250630001447_CreacionPatrones")]
+    partial class CreacionPatrones
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

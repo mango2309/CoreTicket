@@ -13,7 +13,7 @@ export interface Lealtad {
   providedIn: 'root'
 })
 export class LealtadService {
-  private apiUrl = 'https://localhost:7251/api/Lealtad';
+  private apiUrl = 'http://localhost:5062/api/Lealtad';
 
   constructor(private http: HttpClient) {}
 

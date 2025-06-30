@@ -1,33 +1,25 @@
 import { Routes } from '@angular/router';
-import { HomeComponent } from './components/home/home.component';
-import { TicketQueryComponent } from './components/ticket-query/ticket-query.component';
-import { RegisterComponent } from './auth/register/register.component';
-import { LoginComponent } from './auth/login/login.component';
 import { authGuard } from './core/guards/auth.guard';
-import { BeneficiosLealtadComponent } from './components/beneficios-lealtad/beneficios-lealtad.component';
-import { TicketControlComponent } from './components/ticket-control/ticket-control.component';
+import { adminGuard } from './core/guards/admin.guard';
+import { HomeComponent } from './components/home/home.component';
+import { LoginComponent } from './auth/login/login.component';
+import { RegisterComponent } from './auth/register/register.component';
+import { UserAreaComponent } from './areas/user/user-area.component';
+import { AdminAreaComponent } from './areas/admin/admin-area.component';
 
 export const routes: Routes = [
-  { path: '', redirectTo: '/login', pathMatch: 'full' },
+  { path: '', component: HomeComponent },
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
   { 
-    path: 'home', 
-    component: HomeComponent,
+    path: 'user', 
+    component: UserAreaComponent,
     canActivate: [authGuard]
   },
   { 
-    path: 'ticket-query', 
-    component: TicketQueryComponent,
-    canActivate: [authGuard]
+    path: 'admin', 
+    component: AdminAreaComponent,
+    canActivate: [authGuard, adminGuard]
   },
-  {
-    path: 'beneficios-lealtad',
-    component: BeneficiosLealtadComponent
-  },
-  {
-    path: 'ticket-control',
-    component: TicketControlComponent
-  },
-  { path: '**', redirectTo: '/login' }
+  { path: '**', redirectTo: '' }
 ];

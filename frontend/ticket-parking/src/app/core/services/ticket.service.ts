@@ -18,7 +18,7 @@ export interface TicketQuery {
   providedIn: 'root'
 })
 export class TicketService {
-  private apiUrl = 'https://localhost:7251/api/TicketQuery';
+  private apiUrl = 'http://localhost:5062/api/TicketQuery';
   private httpOptions = {
     headers: new HttpHeaders({
       'Content-Type': 'application/json'

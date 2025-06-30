@@ -1,0 +1,206 @@
+<div class="container-fluid mt-4">
+  <h1>Panel de Administración</h1>
+  
+  <!-- Dashboard -->
+  <div class="row mb-4">
+    <div class="col-md-3">
+      <div class="card bg-primary text-white">
+        <div class="card-body text-center">
+          <h3>{{ totalUsuarios }}</h3>
+          <p>Total Usuarios</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card bg-success text-white">
+        <div class="card-body text-center">
+          <h3>{{ totalTickets }}</h3>
+          <p>Total Tickets</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card bg-warning text-white">
+        <div class="card-body text-center">
+          <h3>{{ totalBeneficios }}</h3>
+          <p>Total Beneficios</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card bg-info text-white">
+        <div class="card-body text-center">
+          <h3>${{ ingresosTotales }}</h3>
+          <p>Ingresos Totales</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Gestión de Usuarios -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h5>Gestión de Usuarios</h5>
+          <button class="btn btn-primary btn-sm" (click)="crearUsuario()">
+            <i class="bi bi-person-plus"></i> Crear Usuario
+          </button>
+        </div>
+        <div class="card-body">
+          <div class="input-group mb-3">
+            <input type="text" class="form-control" placeholder="Buscar por email o cédula" [(ngModel)]="filtroUsuarios">
+            <button class="btn btn-outline-secondary" (click)="buscarUsuarios()">Buscar</button>
+          </div>
+          <div class="table-responsive">
+            <table class="table table-hover">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Email</th>
+                  <th>Cédula</th>
+                  <th>Rol</th>
+                  <th>Estado</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let usuario of usuarios">
+                  <td>{{ usuario.id }}</td>
+                  <td>{{ usuario.email }}</td>
+                  <td>{{ usuario.cedula }}</td>
+                  <td><span class="badge bg-primary">{{ usuario.rol }}</span></td>
+                  <td><span class="badge bg-success">Activo</span></td>
+                  <td>
+                    <button class="btn btn-sm btn-outline-primary me-1" (click)="editarUsuario(usuario)">
+                      <i class="bi bi-pencil"></i>
+                    </button>
+                    <button class="btn btn-sm btn-outline-danger" (click)="eliminarUsuario(usuario)">
+                      <i class="bi bi-trash"></i>
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Gestión de Tickets -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header">
+          <h5>Gestión de Tickets</h5>
+        </div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-hover">
+              <thead>
+                <tr>
+                  <th>Código</th>
+                  <th>Usuario</th>
+                  <th>Monto</th>
+                  <th>Estado</th>
+                  <th>Fecha</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let ticket of tickets">
+                  <td>{{ ticket.codigo }}</td>
+                  <td>{{ ticket.usuario }}</td>
+                  <td>${{ ticket.monto }}</td>
+                  <td>
+                    <span [class]="ticket.estado === 'Pagado' ? 'badge bg-success' : 'badge bg-warning'">
+                      {{ ticket.estado }}
+                    </span>
+                  </td>
+                  <td>{{ ticket.fecha | date:'short' }}</td>
+                  <td>
+                    <button class="btn btn-sm btn-outline-info" (click)="verTicket(ticket)">
+                      <i class="bi bi-eye"></i>
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Gestión de Beneficios -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h5>Gestión de Beneficios</h5>
+          <button class="btn btn-primary btn-sm" (click)="crearBeneficio()">
+            <i class="bi bi-plus"></i> Crear Beneficio
+          </button>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-4 mb-3" *ngFor="let beneficio of beneficios">
+              <div class="card h-100">
+                <div class="card-header">
+                  <h6>{{ beneficio.nombre }}</h6>
+                  <span class="badge bg-primary">{{ beneficio.puntosRequeridos }} pts</span>
+                </div>
+                <div class="card-body">
+                  <p>{{ beneficio.descripcion }}</p>
+                  <small class="text-muted">Creado: {{ beneficio.fechaCreacion | date:'short' }}</small>
+                </div>
+                <div class="card-footer">
+                  <button class="btn btn-sm btn-outline-primary me-1" (click)="editarBeneficio(beneficio)">
+                    <i class="bi bi-pencil"></i>
+                  </button>
+                  <button class="btn btn-sm btn-outline-danger" (click)="eliminarBeneficio(beneficio)">
+                    <i class="bi bi-trash"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Reportes -->
+  <div class="row">
+    <div class="col-md-6 mb-4">
+      <div class="card">
+        <div class="card-header">
+          <h5>Reporte de Ingresos</h5>
+        </div>
+        <div class="card-body">
+          <canvas #ingresosChart width="400" height="200"></canvas>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6 mb-4">
+      <div class="card">
+        <div class="card-header">
+          <h5>Estadísticas de Usuarios</h5>
+        </div>
+        <div class="card-body">
+          <div class="row text-center">
+            <div class="col-6">
+              <h4>{{ usuariosActivos }}</h4>
+              <p>Usuarios Activos</p>
+            </div>
+            <div class="col-6">
+              <h4>{{ nuevosUsuarios }}</h4>
+              <p>Nuevos este mes</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div> 

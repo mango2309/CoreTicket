@@ -1,59 +1,144 @@
-# TicketParking
+# CoreTicket - Sistema de Gestión de Parqueo
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.2.8.
+#Link de video de demostracion: https://vimeo.com/1097396201/b2d182afbd?share=copy
 
-## Development server
+## Principios SOLID y Patrones de Diseño implementados
 
-To start a local development server, run:
+- **Single Responsibility Principle (SRP):** El cálculo de puntos de lealtad está separado en un servicio especializado, fuera del controlador.
+- **Dependency Inversion Principle (DIP):** Los controladores dependen de interfaces y no de implementaciones concretas para los servicios de lógica de negocio.
+- **Strategy Pattern:** Se utilizan estrategias intercambiables para el cálculo de puntos de lealtad (por hora, por monto, etc.).
+- **Factory Pattern:** Una fábrica selecciona la estrategia adecuada de cálculo de puntos según el contexto.
 
+---
+
+Sistema completo de gestión de parqueo con programa de lealtad, desarrollado con Angular 17 (frontend) y ASP.NET Core (backend).
+
+## Estructura del Proyecto
+
+### Frontend (Angular 17)
+```
+frontend/ticket-parking/
+├── src/app/
+│   ├── areas/
+│   │   ├── user/
+│   │   │   └── user-area.component.ts          # Componente principal del área de usuario
+│   │   └── admin/
+│   │       └── admin-area.component.ts         # Componente principal del área de administrador
+│   ├── auth/
+│   │   ├── login/
+│   │   └── register/
+│   ├── components/
+│   │   ├── home/
+│   │   ├── navbar/
+│   │   └── ...
+│   ├── core/
+│   │   ├── guards/
+│   │   ├── services/
+│   │   └── models/
+│   └── app.routes.ts
+```
+
+### Backend (ASP.NET Core)
+```
+backend/TicketParkingAPI/
+├── Controllers/
+├── Models/
+├── Services/
+├── Data/
+└── Migrations/
+```
+
+## Características Principales
+
+### Área de Usuario (`UserAreaComponent`)
+- **Dashboard**: Resumen de puntos de lealtad, tickets pagados, beneficios canjeados
+- **Consulta de Tickets**: Buscar y pagar tickets de parqueo
+- **Programa de Lealtad**: Ver puntos acumulados y nivel actual
+- **Canje de Beneficios**: Canjear puntos por beneficios disponibles
+- **Mi Perfil**: Gestionar información personal y estadísticas
+- **Historial de Transacciones**: Ver historial de puntos ganados y canjeados
+
+### Área de Administrador (`AdminAreaComponent`)
+- **Dashboard**: Estadísticas generales del sistema
+- **Gestión de Usuarios**: Crear, editar, eliminar y buscar usuarios
+- **Gestión de Tickets**: Ver todos los tickets del sistema
+- **Gestión de Beneficios**: Crear, editar y eliminar beneficios del programa de lealtad
+- **Reportes**: Estadísticas de ingresos y usuarios
+
+## Instalación y Configuración
+
+### Prerrequisitos
+- Node.js 18+ y npm
+- .NET 8 SDK
+- SQL Server
+
+### Frontend
 ```bash
+cd frontend/ticket-parking
+npm install
 ng serve
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
-
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
+### Backend
 ```bash
-ng generate component component-name
+cd backend/TicketParkingAPI
+dotnet restore
+dotnet ef database update
+dotnet run
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+## Uso del Sistema
 
-```bash
-ng generate --help
-```
+### Acceso
+- **URL Frontend**: http://localhost:4200
+- **URL Backend**: https://localhost:7001
 
-## Building
+### Flujo de Usuario
+1. Registrarse o iniciar sesión
+2. Acceder al área de usuario (`/user`)
+3. Consultar tickets y realizar pagos
+4. Acumular puntos de lealtad
+5. Canjear beneficios disponibles
 
-To build the project run:
+### Flujo de Administrador
+1. Iniciar sesión como administrador
+2. Acceder al área de administración (`/admin`)
+3. Gestionar usuarios, tickets y beneficios
+4. Revisar reportes y estadísticas
 
-```bash
-ng build
-```
+## Tecnologías Utilizadas
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+### Frontend
+- Angular 17 (Standalone Components)
+- Bootstrap 5
+- TypeScript
+- RxJS
 
-## Running unit tests
+### Backend
+- ASP.NET Core 8
+- Entity Framework Core
+- SQL Server
+- JWT Authentication
 
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
+## Estructura de Datos
 
-```bash
-ng test
-```
+### Usuario
+- ID, Email, Cédula, Contraseña, Rol
 
-## Running end-to-end tests
+### Ticket
+- Código, Usuario, Monto, Estado, Fecha
 
-For end-to-end (e2e) testing, run:
+### Lealtad
+- Usuario, Puntos Acumulados, Nivel
 
-```bash
-ng e2e
-```
+### Beneficio
+- Nombre, Descripción, Puntos Requeridos, Estado
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+## Seguridad
+- Autenticación JWT
+- Guards para protección de rutas
+- Roles de usuario y administrador
+- Validación de formularios
 
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+## Desarrollo
+El proyecto está estructurado de manera modular y escalable, permitiendo fácil mantenimiento y extensión de funcionalidades.

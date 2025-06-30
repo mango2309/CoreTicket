@@ -1,27 +1,49 @@
 <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
   <div class="container-fluid">
-    <a class="navbar-brand" href="#">Ticket Parking</a>
+    <a class="navbar-brand" routerLink="/">Ticket Parking</a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarNav">
-      <ul class="navbar-nav ms-auto">
+      <ul class="navbar-nav me-auto">
         <li class="nav-item">
-          <a class="nav-link active" aria-current="page" href="#">Home</a>
+          <a class="nav-link" routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Home</a>
         </li>
-        <li class="nav-item">
-          <a class="nav-link" href="#">Consultar Ticket</a>
+        
+        <!-- Navegación para usuarios autenticados -->
+        <li class="nav-item" *ngIf="authService.isAuthenticated()">
+          <a class="nav-link" routerLink="/user" routerLinkActive="active">Mi Área</a>
         </li>
-        <li class="nav-item">
-          <a class="nav-link" href="#">Salir</a>
+        
+        <!-- Navegación para administradores -->
+        <li class="nav-item" *ngIf="authService.isAuthenticated() && authService.isAdmin()">
+          <a class="nav-link" routerLink="/admin" routerLinkActive="active">Administración</a>
         </li>
       </ul>
-    </div>
-    <div *ngIf="usuarioActual" class="d-flex align-items-center ms-3">
-      <span class="text-white small">
-        <i class="bi bi-person-circle"></i>
-        {{ usuarioActual.nombre || usuarioActual.email }} (ID: {{ usuarioActual.idUsuario }})
-      </span>
+      
+      <ul class="navbar-nav ms-auto">
+        <!-- Usuario no autenticado -->
+        <li class="nav-item" *ngIf="!authService.isAuthenticated()">
+          <a class="nav-link" routerLink="/login" routerLinkActive="active">Iniciar Sesión</a>
+        </li>
+        <li class="nav-item" *ngIf="!authService.isAuthenticated()">
+          <a class="nav-link" routerLink="/register" routerLinkActive="active">Registrarse</a>
+        </li>
+        
+        <!-- Usuario autenticado -->
+        <li class="nav-item dropdown" *ngIf="authService.isAuthenticated()">
+          <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="bi bi-person-circle"></i>
+            {{ usuarioActual?.email || 'Usuario' }}
+          </a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" routerLink="/user/profile">Mi Perfil</a></li>
+            <li><a class="dropdown-item" routerLink="/user/dashboard">Dashboard</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="#" (click)="logout()">Cerrar Sesión</a></li>
+          </ul>
+        </li>
+      </ul>
     </div>
   </div>
 </nav>

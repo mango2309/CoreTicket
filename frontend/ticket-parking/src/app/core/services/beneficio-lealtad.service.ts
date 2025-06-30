@@ -16,7 +16,7 @@ export interface BeneficioLealtad {
   providedIn: 'root'
 })
 export class BeneficioLealtadService {
-  private apiUrl = 'https://localhost:7251/api/BeneficioLealtad';
+  private apiUrl = 'http://localhost:5062/api/BeneficioLealtad';
 
   constructor(private http: HttpClient) {}
 
@@ -38,4 +38,4 @@ export class BeneficioLealtadService {
       usuarioId
     });
   }
-} 
+}

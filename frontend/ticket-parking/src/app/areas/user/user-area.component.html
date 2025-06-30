@@ -1,0 +1,133 @@
+<div class="container-fluid mt-4">
+  <h1>Panel de Usuario</h1>
+  
+  <!-- Dashboard -->
+  <div class="row mb-4">
+    <div class="col-md-3">
+      <div class="card bg-primary text-white">
+        <div class="card-body text-center">
+          <h3>{{ puntosLealtad }}</h3>
+          <p>Puntos de Lealtad</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card bg-success text-white">
+        <div class="card-body text-center">
+          <h3>{{ ticketsPagados }}</h3>
+          <p>Tickets Pagados</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card bg-warning text-white">
+        <div class="card-body text-center">
+          <h3>{{ beneficiosCanjeados }}</h3>
+          <p>Beneficios Canjeados</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card bg-info text-white">
+        <div class="card-body text-center">
+          <h3>{{ nivelActual }}</h3>
+          <p>Nivel Actual</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Funcionalidades -->
+  <div class="row">
+    <div class="col-md-6 mb-4">
+      <div class="card">
+        <div class="card-header">
+          <h5>Consultar Ticket</h5>
+        </div>
+        <div class="card-body">
+          <div class="input-group">
+            <input type="text" class="form-control" placeholder="Código del ticket" [(ngModel)]="ticketCode">
+            <button class="btn btn-primary" (click)="buscarTicket()">Buscar</button>
+          </div>
+          <div *ngIf="ticketEncontrado" class="mt-3">
+            <p><strong>Código:</strong> {{ ticketEncontrado.codigo }}</p>
+            <p><strong>Monto:</strong> ${{ ticketEncontrado.monto }}</p>
+            <button class="btn btn-success" (click)="pagarTicket()">Pagar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-6 mb-4">
+      <div class="card">
+        <div class="card-header">
+          <h5>Canjear Beneficios</h5>
+        </div>
+        <div class="card-body">
+          <p><strong>Puntos disponibles:</strong> {{ puntosLealtad }}</p>
+          <div *ngFor="let beneficio of beneficios" class="mb-2">
+            <div class="d-flex justify-content-between align-items-center">
+              <span>{{ beneficio.nombre }} ({{ beneficio.puntosRequeridos }} pts)</span>
+              <button class="btn btn-sm btn-success" 
+                      [disabled]="puntosLealtad < beneficio.puntosRequeridos"
+                      (click)="canjearBeneficio(beneficio)">
+                Canjear
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-6 mb-4">
+      <div class="card">
+        <div class="card-header">
+          <h5>Mi Perfil</h5>
+        </div>
+        <div class="card-body">
+          <div class="mb-3">
+            <label class="form-label">Email</label>
+            <input type="email" class="form-control" [(ngModel)]="usuarioActual.email">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Cédula</label>
+            <input type="text" class="form-control" [(ngModel)]="usuarioActual.cedula">
+          </div>
+          <button class="btn btn-primary" (click)="actualizarPerfil()">Guardar</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-6 mb-4">
+      <div class="card">
+        <div class="card-header">
+          <h5>Historial de Transacciones</h5>
+        </div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-sm">
+              <thead>
+                <tr>
+                  <th>Fecha</th>
+                  <th>Descripción</th>
+                  <th>Puntos</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let transaccion of transacciones">
+                  <td>{{ transaccion.fecha | date:'short' }}</td>
+                  <td>{{ transaccion.descripcion }}</td>
+                  <td [class]="transaccion.tipo === 'acumulacion' ? 'text-success' : 'text-danger'">
+                    {{ transaccion.tipo === 'acumulacion' ? '+' : '-' }}{{ transaccion.puntos }}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div> 
