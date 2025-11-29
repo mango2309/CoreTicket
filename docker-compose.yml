@@ -1,0 +1,120 @@
+version: '3.8'
+
+services:
+  # Base de datos para Keycloak
+  postgres-keycloak:
+    image: postgres:15-alpine
+    container_name: postgres-keycloak
+    environment:
+      POSTGRES_DB: keycloak
+      POSTGRES_USER: keycloak
+      POSTGRES_PASSWORD: keycloak_password
+    volumes:
+      - postgres_keycloak_data:/var/lib/postgresql/data
+    networks:
+      - security-network
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U keycloak" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Keycloak - Identity Provider
+  keycloak:
+    image: quay.io/keycloak/keycloak:23.0
+    container_name: keycloak
+    command: start-dev
+    environment:
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://postgres-keycloak:5432/keycloak
+      KC_DB_USERNAME: keycloak
+      KC_DB_PASSWORD: keycloak_password
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+      KC_HTTP_PORT: 8080
+      KC_HOSTNAME_STRICT: false
+      KC_HOSTNAME_STRICT_HTTPS: false
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres-keycloak:
+        condition: service_healthy
+    networks:
+      - security-network
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -f http://localhost:8080/health/ready || exit 1" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+
+  # Base de datos para Sistema A (CoreTicket)
+  postgres-systema:
+    image: postgres:15-alpine
+    container_name: postgres-systema
+    environment:
+      POSTGRES_DB: coreticket
+      POSTGRES_USER: coreticket_user
+      POSTGRES_PASSWORD: coreticket_pass
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_systema_data:/var/lib/postgresql/data
+    networks:
+      - security-network
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U coreticket_user" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Base de datos para Sistema B (Payment Service)
+  postgres-systemb:
+    image: postgres:15-alpine
+    container_name: postgres-systemb
+    environment:
+      POSTGRES_DB: payments
+      POSTGRES_USER: payments_user
+      POSTGRES_PASSWORD: payments_pass
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_systemb_data:/var/lib/postgresql/data
+    networks:
+      - security-network
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U payments_user" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # HashiCorp Vault - Key Management Service
+  vault:
+    image: hashicorp/vault:latest
+    container_name: vault
+    ports:
+      - "8200:8200"
+    environment:
+      VAULT_DEV_ROOT_TOKEN_ID: "root-token"
+      VAULT_DEV_LISTEN_ADDRESS: "0.0.0.0:8200"
+    cap_add:
+      - IPC_LOCK
+    networks:
+      - security-network
+    healthcheck:
+      test: [ "CMD", "vault", "status" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_keycloak_data:
+    driver: local
+  postgres_systema_data:
+    driver: local
+  postgres_systemb_data:
+    driver: local
+
+networks:
+  security-network:
+    driver: bridge

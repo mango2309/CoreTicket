@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "ticket-parking": {
+    "payment-portal": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
@@ -17,7 +17,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:application",
           "options": {
-            "outputPath": "dist/ticket-parking",
+            "outputPath": "dist/payment-portal",
             "index": "src/index.html",
             "browser": "src/main.ts",
             "polyfills": [
@@ -32,13 +32,9 @@
               }
             ],
             "styles": [
-              "node_modules/bootstrap/dist/css/bootstrap.min.css",
               "src/styles.scss"
             ],
-            "scripts": [
-              "node_modules/@popperjs/core/dist/umd/popper.min.js",
-              "node_modules/bootstrap/dist/js/bootstrap.min.js"
-            ]
+            "scripts": []
           },
           "configurations": {
             "production": {
@@ -68,10 +64,10 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "ticket-parking:build:production"
+              "buildTarget": "payment-portal:build:production"
             },
             "development": {
-              "buildTarget": "ticket-parking:build:development"
+              "buildTarget": "payment-portal:build:development"
             }
           },
           "defaultConfiguration": "development"
@@ -102,8 +98,5 @@
         }
       }
     }
-  },
-  "cli": {
-    "analytics": "011f8e91-3d09-474b-b004-09a07161c851"
   }
 }

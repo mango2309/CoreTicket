@@ -24,3 +24,9 @@ Thumbs.db
 # ==== GIT ====
 # (Esto solo aplica si por error queda un .git en carpetas internas, como ya te pasó)
 frontend/ticket-parking/.git/
+
+# ==== DOCKER & ENVIRONMENT ====
+.env
+docker-compose.override.yml
+postgres_*_data/
+

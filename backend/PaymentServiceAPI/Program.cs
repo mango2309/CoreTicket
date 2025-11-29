@@ -1,8 +1,5 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using TicketParkingAPI.Data;
-using TicketParkingAPI.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,7 +8,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
-    c.SwaggerDoc("v1", new() { Title = "CoreTicket API", Version = "v1" });
+    c.SwaggerDoc("v1", new() { Title = "Payment Service API", Version = "v1" });
     
     // Configurar Swagger para JWT
     c.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
@@ -39,10 +36,6 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
-// Configurar base de datos (PostgreSQL)
-builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
-
 // Configurar autenticación JWT con Keycloak
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
@@ -60,49 +53,32 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidAudience = builder.Configuration["Jwt:Audience"],
             ValidateLifetime = true,
             ClockSkew = TimeSpan.Zero,
-            RoleClaimType = "realm_access.roles" // Keycloak usa esta estructura para roles
+            RoleClaimType = "realm_access.roles"
         };
         
         options.Events = new JwtBearerEvents
         {
             OnAuthenticationFailed = context =>
             {
-                Console.WriteLine($"Authentication failed: {context.Exception.Message}");
+                Console.WriteLine($"[Payment Service] Authentication failed: {context.Exception.Message}");
                 return Task.CompletedTask;
             },
             OnTokenValidated = context =>
             {
-                Console.WriteLine($"Token validated for user: {context.Principal?.Identity?.Name}");
+                Console.WriteLine($"[Payment Service] Token validated for user: {context.Principal?.Identity?.Name}");
                 return Task.CompletedTask;
             }
         };
     });
 
-// Configurar autorización con políticas
+// Configurar autorización
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("AdminOnly", policy => 
         policy.RequireRole("admin"));
     options.AddPolicy("OperatorOrAdmin", policy => 
         policy.RequireRole("admin", "operator"));
-    options.AddPolicy("AllUsers", policy => 
-        policy.RequireRole("admin", "operator", "viewer"));
 });
-
-// CORS para Angular
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("AllowAngular", policy =>
-    {
-        policy.WithOrigins("http://localhost:4200")
-              .AllowAnyHeader()
-              .AllowAnyMethod()
-              .AllowCredentials();
-    });
-});
-
-// Servicios de negocio
-builder.Services.AddScoped<IPuntosLealtadService, PuntosLealtadService>();
 
 var app = builder.Build();
 
@@ -114,7 +90,6 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-app.UseCors("AllowAngular");
 
 // ⚠️ IMPORTANTE: UseAuthentication debe ir ANTES de UseAuthorization
 app.UseAuthentication();
@@ -123,4 +98,3 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
-

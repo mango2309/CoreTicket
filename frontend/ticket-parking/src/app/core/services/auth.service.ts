@@ -1,72 +1,78 @@
-import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
-import { isPlatformBrowser } from '@angular/common';
+import { Injectable, inject } from '@angular/core';
+import { KeycloakService } from 'keycloak-angular';
+import { KeycloakProfile } from 'keycloak-js';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  private readonly USER_ID_KEY = 'userId';
-  private readonly USER_ROLE_KEY = 'userRole';
-  private isBrowser: boolean;
+  private keycloak = inject(KeycloakService);
 
-  constructor(@Inject(PLATFORM_ID) private platformId: Object) {
-    this.isBrowser = isPlatformBrowser(this.platformId);
+  async isAuthenticated(): Promise<boolean> {
+    return await this.keycloak.isLoggedIn();
   }
 
-  getUsuarioId(): number | null {
-    if (!this.isBrowser) return null;
-    const userId = localStorage.getItem(this.USER_ID_KEY);
-    return userId ? parseInt(userId, 10) : null;
+  async getUserProfile(): Promise<KeycloakProfile | null> {
+    try {
+      return await this.keycloak.loadUserProfile();
+    } catch (error) {
+      return null;
+    }
   }
 
-  setUsuarioId(userId: number): void {
-    if (!this.isBrowser) return;
-    localStorage.setItem(this.USER_ID_KEY, userId.toString());
+  getUserRoles(): string[] {
+    return this.keycloak.getUserRoles();
   }
 
-  clearUsuarioId(): void {
-    if (!this.isBrowser) return;
-    localStorage.removeItem(this.USER_ID_KEY);
-  }
-
-  getUserRole(): string | null {
-    if (!this.isBrowser) return null;
-    return localStorage.getItem(this.USER_ROLE_KEY);
-  }
-
-  setUserRole(role: string): void {
-    if (!this.isBrowser) return;
-    localStorage.setItem(this.USER_ROLE_KEY, role);
-  }
-
-  clearUserRole(): void {
-    if (!this.isBrowser) return;
-    localStorage.removeItem(this.USER_ROLE_KEY);
-  }
-
-  isAuthenticated(): boolean {
-    if (!this.isBrowser) return false;
-    return this.getUsuarioId() !== null;
+  hasRole(role: string): boolean {
+    return this.keycloak.isUserInRole(role);
   }
 
   isAdmin(): boolean {
-    if (!this.isBrowser) return false;
-    return this.getUserRole() === 'admin';
+    return this.hasRole('admin');
+  }
+
+  isOperator(): boolean {
+    return this.hasRole('operator');
+  }
+
+  isViewer(): boolean {
+    return this.hasRole('viewer');
+  }
+
+  async getUsername(): Promise<string> {
+    const profile = await this.getUserProfile();
+    return profile?.username || profile?.firstName || 'Usuario';
+  }
+
+  async getEmail(): Promise<string | undefined> {
+    const profile = await this.getUserProfile();
+    return profile?.email;
+  }
+
+  login(): void {
+    this.keycloak.login();
   }
 
   logout(): void {
-    if (!this.isBrowser) return;
-    this.clearUsuarioId();
-    this.clearUserRole();
+    this.keycloak.logout(window.location.origin);
   }
 
-  getCurrentUser(): { userId: number, userRole: string | null } | null {
-    if (!this.isBrowser) return null;
-    const userId = this.getUsuarioId();
-    const userRole = this.getUserRole();
-    if (userId !== null) {
-      return { userId, userRole };
-    }
-    return null;
+  getToken(): Promise<string> {
+    return this.keycloak.getToken();
+  }
+
+  async getCurrentUser(): Promise<{ username: string; email?: string; roles: string[] } | null> {
+    const isLoggedIn = await this.isAuthenticated();
+    if (!isLoggedIn) return null;
+
+    const profile = await this.getUserProfile();
+    const roles = this.getUserRoles();
+
+    return {
+      username: profile?.username || profile?.firstName || 'Usuario',
+      email: profile?.email,
+      roles
+    };
   }
 }
