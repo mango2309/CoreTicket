@@ -1,4 +1,4 @@
-<app-navbar></app-navbar>
+<app-navbar *ngIf="showNavbar"></app-navbar>
 <div *ngIf="loading" class="global-loader">
   <div class="spinner-border text-primary" role="status">
     <span class="visually-hidden">Cargando...</span>
