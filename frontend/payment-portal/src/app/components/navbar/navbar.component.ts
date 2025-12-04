@@ -3,25 +3,25 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 
 @Component({
-  selector: 'app-navbar',
-  standalone: true,
-  imports: [CommonModule, RouterModule],
-  template: `
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    selector: 'app-navbar',
+    standalone: true,
+    imports: [CommonModule, RouterModule],
+    template: `
+    <nav class="navbar navbar-expand-lg navbar-dark bg-success">
       <div class="container-fluid">
-        <a class="navbar-brand" routerLink="/admin">
-          <i class="bi bi-ticket-perforated"></i> CoreTicket
+        <a class="navbar-brand" routerLink="/payments">
+          <i class="bi bi-credit-card"></i> Payment Portal
         </a>
         
         <button class="navbar-toggler" type="button" (click)="toggleNavbar()">
           <span class="navbar-toggler-icon"></span>
         </button>
         
-        <div class="collapse navbar-collapse" [class.show]="isNavbarOpen" id="navbarNav">
+        <div class="collapse navbar-collapse" [class.show]="isNavbarOpen">
           <ul class="navbar-nav me-auto">
             <li class="nav-item">
-              <a class="nav-link" routerLink="/admin" routerLinkActive="active">
-                <i class="bi bi-speedometer2"></i> Dashboard
+              <a class="nav-link" routerLink="/payments" routerLinkActive="active">
+                <i class="bi bi-cash-stack"></i> Pagos
               </a>
             </li>
           </ul>
@@ -45,7 +45,7 @@ import { RouterModule } from '@angular/router';
                 <li><hr class="dropdown-divider"></li>
                 <li class="px-3 py-2">
                   <small class="text-muted d-block mb-1">Rol:</small>
-                  <span class="badge bg-primary">{{ role }}</span>
+                  <span class="badge bg-success">{{ role }}</span>
                 </li>
                 <li><hr class="dropdown-divider"></li>
                 <li>
@@ -60,7 +60,7 @@ import { RouterModule } from '@angular/router';
       </div>
     </nav>
   `,
-  styles: [`
+    styles: [`
     .navbar-brand {
       font-weight: bold;
       font-size: 1.5rem;
@@ -92,69 +92,62 @@ import { RouterModule } from '@angular/router';
   `]
 })
 export class NavbarComponent implements OnInit {
-  username: string = 'Usuario';
-  email: string = 'usuario@coreticket.com';
-  role: string = 'admin';
-  isDropdownOpen: boolean = false;
-  isNavbarOpen: boolean = false;
+    username: string = 'Usuario';
+    email: string = 'usuario@payment.com';
+    role: string = 'operator';
+    isDropdownOpen: boolean = false;
+    isNavbarOpen: boolean = false;
 
-  ngOnInit() {
-    this.loadUserInfo();
-  }
-
-  loadUserInfo() {
-    this.username = 'admin.user';
-    this.email = 'admin@coreticket.com';
-    this.role = 'admin';
-  }
-
-  toggleDropdown(event: Event) {
-    event.preventDefault();
-    event.stopPropagation();
-    this.isDropdownOpen = !this.isDropdownOpen;
-
-    if (this.isDropdownOpen) {
-      setTimeout(() => {
-        document.addEventListener('click', this.closeDropdown.bind(this), { once: true });
-      }, 0);
+    ngOnInit() {
+        this.loadUserInfo();
     }
-  }
 
-  closeDropdown() {
-    this.isDropdownOpen = false;
-  }
+    loadUserInfo() {
+        this.username = 'admin.user';
+        this.email = 'admin@coreticket.com';
+        this.role = 'admin';
+    }
 
-  toggleNavbar() {
-    this.isNavbarOpen = !this.isNavbarOpen;
-  }
+    toggleDropdown(event: Event) {
+        event.preventDefault();
+        event.stopPropagation();
+        this.isDropdownOpen = !this.isDropdownOpen;
 
-  logout(event: Event) {
-    event.preventDefault();
+        if (this.isDropdownOpen) {
+            setTimeout(() => {
+                document.addEventListener('click', this.closeDropdown.bind(this), { once: true });
+            }, 0);
+        }
+    }
 
-    console.log('🚪 Cerrando sesión y limpiando cookies de Keycloak...');
+    closeDropdown() {
+        this.isDropdownOpen = false;
+    }
 
-    // Limpiar storage local
-    localStorage.clear();
-    sessionStorage.clear();
+    toggleNavbar() {
+        this.isNavbarOpen = !this.isNavbarOpen;
+    }
 
-    // Limpiar cookies de Keycloak
-    document.cookie.split(";").forEach((c) => {
-      document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
-    });
+    logout(event: Event) {
+        event.preventDefault();
 
-    // Redirigir a logout de Keycloak SIN redirect_uri
-    const logoutUrl = 'http://localhost:8080/realms/coreticket-realm/protocol/openid-connect/logout';
+        console.log('🚪 Cerrando sesión del Payment Portal...');
 
-    console.log('🔐 Cerrando sesión en Keycloak...');
+        localStorage.clear();
+        sessionStorage.clear();
 
-    // Hacer logout en Keycloak en segundo plano
-    fetch(logoutUrl, {
-      method: 'GET',
-      credentials: 'include'
-    }).finally(() => {
-      // Después de cerrar sesión en Keycloak, redirigir a landing
-      console.log('🏠 Redirigiendo a landing page');
-      window.location.href = '/';
-    });
-  }
+        document.cookie.split(";").forEach((c) => {
+            document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
+        });
+
+        const logoutUrl = 'http://localhost:8080/realms/coreticket-realm/protocol/openid-connect/logout';
+
+        fetch(logoutUrl, {
+            method: 'GET',
+            credentials: 'include'
+        }).finally(() => {
+            console.log('🏠 Redirigiendo a landing page');
+            window.location.href = '/';
+        });
+    }
 }
