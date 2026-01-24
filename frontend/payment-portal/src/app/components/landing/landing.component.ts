@@ -1,11 +1,13 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { KeycloakService } from 'keycloak-angular';
+import { Router } from '@angular/router';
 
 @Component({
-    selector: 'app-landing',
-    standalone: true,
-    imports: [CommonModule],
-    template: `
+  selector: 'app-landing',
+  standalone: true,
+  imports: [CommonModule],
+  template: `
     <div class="landing-container">
       <div class="hero-section">
         <div class="container">
@@ -71,7 +73,7 @@ import { CommonModule } from '@angular/common';
       </div>
     </div>
   `,
-    styles: [`
+  styles: [`
     .landing-container {
       min-height: 100vh;
       background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
@@ -256,17 +258,20 @@ import { CommonModule } from '@angular/common';
   `]
 })
 export class LandingComponent {
-    login() {
-        const redirectUri = window.location.origin + '/callback';
-        const keycloakUrl = 'http://localhost:8080/realms/coreticket-realm/protocol/openid-connect/auth' +
-            '?client_id=payment-client' +
-            '&redirect_uri=' + encodeURIComponent(redirectUri) +
-            '&response_type=code' +
-            '&scope=openid';
-
-        console.log('🔐 Redirigiendo a Keycloak (Payment Portal)...');
-        console.log('URL:', keycloakUrl);
-
-        window.location.replace(keycloakUrl);
+  constructor(
+    private keycloak: KeycloakService,
+    private router: Router
+  ) {
+    // Si ya está autenticado, redirigir al dashboard
+    if (this.keycloak.isLoggedIn()) {
+      this.router.navigate(['/payments']);
     }
+  }
+
+  login() {
+    console.log('🔐 Iniciando login con Keycloak...');
+    this.keycloak.login({
+      redirectUri: window.location.origin + '/payments'
+    });
+  }
 }

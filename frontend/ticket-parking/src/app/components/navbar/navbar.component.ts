@@ -98,11 +98,15 @@ export class NavbarComponent implements OnInit {
   isDropdownOpen: boolean = false;
   isNavbarOpen: boolean = false;
 
+  constructor() { }
+
   ngOnInit() {
     this.loadUserInfo();
   }
 
   loadUserInfo() {
+    // Aquí podríamos leer del token si fuera necesario, pero por ahora estático para evitar complejidad
+    // En una implementación completa decodificaríamos el JWT del localStorage
     this.username = 'admin.user';
     this.email = 'admin@coreticket.com';
     this.role = 'admin';
@@ -131,30 +135,22 @@ export class NavbarComponent implements OnInit {
   logout(event: Event) {
     event.preventDefault();
 
-    console.log('🚪 Cerrando sesión y limpiando cookies de Keycloak...');
+    console.log('🚪 Cerrando sesión en CoreTicket (Sistema A)...');
 
-    // Limpiar storage local
+    // 1. Limpiar almacenamiento local
     localStorage.clear();
     sessionStorage.clear();
 
-    // Limpiar cookies de Keycloak
-    document.cookie.split(";").forEach((c) => {
-      document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
-    });
-
-    // Redirigir a logout de Keycloak SIN redirect_uri
+    // 2. Construir URL de logout de Keycloak
     const logoutUrl = 'http://localhost:8080/realms/coreticket-realm/protocol/openid-connect/logout';
 
-    console.log('🔐 Cerrando sesión en Keycloak...');
+    // 3. Definir a dónde volver después del logout (Landing page)
+    const postLogoutRedirectUri = window.location.origin; // http://localhost:4200
 
-    // Hacer logout en Keycloak en segundo plano
-    fetch(logoutUrl, {
-      method: 'GET',
-      credentials: 'include'
-    }).finally(() => {
-      // Después de cerrar sesión en Keycloak, redirigir a landing
-      console.log('🏠 Redirigiendo a landing page');
-      window.location.href = '/';
-    });
+    // 4. Redirigir manualmente
+    const fullLogoutUrl = `${logoutUrl}?post_logout_redirect_uri=${encodeURIComponent(postLogoutRedirectUri)}&client_id=coreticket-client`;
+
+    console.log('Redirigiendo a:', fullLogoutUrl);
+    window.location.href = fullLogoutUrl;
   }
 }

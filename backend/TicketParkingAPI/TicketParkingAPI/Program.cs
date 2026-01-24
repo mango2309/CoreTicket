@@ -104,6 +104,12 @@ builder.Services.AddCors(options =>
 // Servicios de negocio
 builder.Services.AddScoped<IPuntosLealtadService, PuntosLealtadService>();
 
+// Servicios de Vault (KMS)
+builder.Services.AddScoped<IVaultService, VaultService>();
+
+// Cliente para comunicación con Sistema B
+builder.Services.AddHttpClient<IPaymentServiceClient, PaymentServiceClient>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

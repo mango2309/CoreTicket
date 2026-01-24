@@ -257,17 +257,13 @@ import { CommonModule } from '@angular/common';
 })
 export class LandingComponent {
   login() {
-    const redirectUri = window.location.origin + '/callback';
+    console.log('🔐 Redirigiendo a Keycloak...');
     const keycloakUrl = 'http://localhost:8080/realms/coreticket-realm/protocol/openid-connect/auth' +
       '?client_id=coreticket-client' +
-      '&redirect_uri=' + encodeURIComponent(redirectUri) +
+      '&redirect_uri=' + encodeURIComponent(window.location.origin + '/admin') +
       '&response_type=code' +
       '&scope=openid';
 
-    console.log('🔐 Redirigiendo a Keycloak...');
-    console.log('URL:', keycloakUrl);
-
-    // Forzar redirección completa
-    window.location.replace(keycloakUrl);
+    window.location.href = keycloakUrl;
   }
 }

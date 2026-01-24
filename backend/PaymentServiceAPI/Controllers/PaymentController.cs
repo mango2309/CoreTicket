@@ -71,20 +71,97 @@ public class PaymentController : ControllerBase
     }
 
     /// <summary>
-    /// Endpoint para recibir datos encriptados (para Sprint 4)
+    /// Endpoint para recibir datos encriptados desde Sistema A
+    /// Desencripta usando HashiCorp Vault KMS
     /// </summary>
     [HttpPost("process-encrypted")]
     [Authorize(Roles = "admin,operator")]
-    public IActionResult ProcessEncryptedPayment([FromBody] EncryptedPayload payload)
+    public async Task<IActionResult> ProcessEncryptedPayment(
+        [FromBody] EncryptedPayload payload,
+        [FromServices] Services.IVaultService vaultService)
     {
-        _logger.LogInformation("Received encrypted payment payload");
+        try
+        {
+            var userId = User.FindFirst("sub")?.Value ?? "unknown";
+            _logger.LogInformation(
+                "[Payment Service] Received encrypted payment from user {UserId}",
+                userId
+            );
 
-        // TODO: En Sprint 4 se implementará la desencriptación con KMS
-        return Ok(new 
-        { 
-            message = "Encrypted payload received (decryption pending Sprint 4)",
-            payloadReceived = true
-        });
+            // 1. Verificar que Vault esté disponible
+            var isVaultHealthy = await vaultService.IsHealthyAsync();
+            if (!isVaultHealthy)
+            {
+                _logger.LogError("[Payment Service] Vault is not healthy");
+                return StatusCode(503, new
+                {
+                    success = false,
+                    message = "KMS service unavailable"
+                });
+            }
+
+            // 2. Desencriptar el payload usando Vault
+            _logger.LogInformation("[Payment Service] Decrypting payment data with Vault...");
+            var decryptedJson = await vaultService.DecryptAsync(payload.EncryptedData);
+
+            // 3. Parsear los datos desencriptados
+            var paymentData = System.Text.Json.JsonSerializer.Deserialize<PaymentData>(decryptedJson);
+
+            if (paymentData == null)
+            {
+                _logger.LogError("[Payment Service] Failed to parse decrypted payment data");
+                return BadRequest(new
+                {
+                    success = false,
+                    message = "Invalid payment data format"
+                });
+            }
+
+            _logger.LogInformation(
+                "[Payment Service] Payment decrypted successfully: Amount={Amount}, Description={Description}",
+                paymentData.Amount,
+                paymentData.Description
+            );
+
+            // 4. Procesar el pago (lógica de negocio)
+            var paymentResponse = new PaymentResponse(
+                PaymentId: Guid.NewGuid(),
+                Amount: paymentData.Amount,
+                Description: paymentData.Description,
+                Status: "completed",
+                ProcessedBy: userId,
+                ProcessedAt: DateTime.UtcNow
+            );
+
+            _logger.LogInformation(
+                "[Payment Service] Payment processed successfully: PaymentId={PaymentId}",
+                paymentResponse.PaymentId
+            );
+
+            // 5. Retornar respuesta
+            return Ok(new
+            {
+                success = true,
+                message = "Encrypted payment processed successfully",
+                data = paymentResponse,
+                encryption = new
+                {
+                    method = "HashiCorp Vault Transit Engine",
+                    keyReference = payload.EncryptedKey,
+                    decryptedAt = DateTime.UtcNow
+                }
+            });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "[Payment Service] Error processing encrypted payment");
+            return StatusCode(500, new
+            {
+                success = false,
+                message = "Error processing encrypted payment",
+                error = ex.Message
+            });
+        }
     }
 
     /// <summary>

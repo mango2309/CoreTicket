@@ -21,7 +21,15 @@ export class AppComponent {
     this.router.events.pipe(
       filter(event => event instanceof NavigationEnd)
     ).subscribe((event: any) => {
-      this.showNavbar = !['/', '/callback'].includes(event.url);
+      // Obtener la ruta base sin parámetros
+      const url = event.urlAfterRedirects || event.url;
+      const baseUrl = url.split('?')[0];
+
+      console.log('Navegación:', { url, baseUrl });
+
+      // Mostrar navbar solo si NO estamos en landing o callback
+      this.showNavbar = !['/', '/callback'].includes(baseUrl);
+      console.log('Show navbar:', this.showNavbar);
     });
 
     // Loader para navegación

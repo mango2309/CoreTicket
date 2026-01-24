@@ -99,19 +99,18 @@ try {
     }
 }
 
-# Crear Cliente para Sistema B (confidencial)
+# Crear Cliente para Sistema B (público - SPA)
 Write-Host ""
 Write-Host "4️⃣  Creando cliente 'payment-client' (Sistema B)..." -ForegroundColor Yellow
 
 $clientBBody = @{
     clientId = "payment-client"
     enabled = $true
-    publicClient = $false
+    publicClient = $true
     directAccessGrantsEnabled = $true
     standardFlowEnabled = $true
-    serviceAccountsEnabled = $true
-    redirectUris = @("*")
-    webOrigins = @("*")
+    redirectUris = @("http://localhost:62579/*", "http://localhost:*")
+    webOrigins = @("http://localhost:62579", "http://localhost:*")
     protocol = "openid-connect"
 } | ConvertTo-Json
 

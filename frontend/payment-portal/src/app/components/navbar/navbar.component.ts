@@ -1,12 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { KeycloakService } from 'keycloak-angular';
 
 @Component({
-    selector: 'app-navbar',
-    standalone: true,
-    imports: [CommonModule, RouterModule],
-    template: `
+  selector: 'app-navbar',
+  standalone: true,
+  imports: [CommonModule, RouterModule],
+  template: `
     <nav class="navbar navbar-expand-lg navbar-dark bg-success">
       <div class="container-fluid">
         <a class="navbar-brand" routerLink="/payments">
@@ -60,7 +61,7 @@ import { RouterModule } from '@angular/router';
       </div>
     </nav>
   `,
-    styles: [`
+  styles: [`
     .navbar-brand {
       font-weight: bold;
       font-size: 1.5rem;
@@ -92,62 +93,50 @@ import { RouterModule } from '@angular/router';
   `]
 })
 export class NavbarComponent implements OnInit {
-    username: string = 'Usuario';
-    email: string = 'usuario@payment.com';
-    role: string = 'operator';
-    isDropdownOpen: boolean = false;
-    isNavbarOpen: boolean = false;
+  username: string = 'Usuario';
+  email: string = 'usuario@payment.com';
+  role: string = 'operator';
+  isDropdownOpen: boolean = false;
+  isNavbarOpen: boolean = false;
 
-    ngOnInit() {
-        this.loadUserInfo();
+  constructor(private keycloak: KeycloakService) { }
+
+  ngOnInit() {
+    this.loadUserInfo();
+  }
+
+  loadUserInfo() {
+    this.username = 'admin.user';
+    this.email = 'admin@coreticket.com';
+    this.role = 'admin';
+  }
+
+  toggleDropdown(event: Event) {
+    event.preventDefault();
+    event.stopPropagation();
+    this.isDropdownOpen = !this.isDropdownOpen;
+
+    if (this.isDropdownOpen) {
+      setTimeout(() => {
+        document.addEventListener('click', this.closeDropdown.bind(this), { once: true });
+      }, 0);
     }
+  }
 
-    loadUserInfo() {
-        this.username = 'admin.user';
-        this.email = 'admin@coreticket.com';
-        this.role = 'admin';
-    }
+  closeDropdown() {
+    this.isDropdownOpen = false;
+  }
 
-    toggleDropdown(event: Event) {
-        event.preventDefault();
-        event.stopPropagation();
-        this.isDropdownOpen = !this.isDropdownOpen;
+  toggleNavbar() {
+    this.isNavbarOpen = !this.isNavbarOpen;
+  }
 
-        if (this.isDropdownOpen) {
-            setTimeout(() => {
-                document.addEventListener('click', this.closeDropdown.bind(this), { once: true });
-            }, 0);
-        }
-    }
+  logout(event: Event) {
+    event.preventDefault();
 
-    closeDropdown() {
-        this.isDropdownOpen = false;
-    }
+    console.log('🚪 Cerrando sesión del Payment Portal...');
 
-    toggleNavbar() {
-        this.isNavbarOpen = !this.isNavbarOpen;
-    }
-
-    logout(event: Event) {
-        event.preventDefault();
-
-        console.log('🚪 Cerrando sesión del Payment Portal...');
-
-        localStorage.clear();
-        sessionStorage.clear();
-
-        document.cookie.split(";").forEach((c) => {
-            document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
-        });
-
-        const logoutUrl = 'http://localhost:8080/realms/coreticket-realm/protocol/openid-connect/logout';
-
-        fetch(logoutUrl, {
-            method: 'GET',
-            credentials: 'include'
-        }).finally(() => {
-            console.log('🏠 Redirigiendo a landing page');
-            window.location.href = '/';
-        });
-    }
+    // Usar el método de logout de Keycloak que redirige a la landing page
+    this.keycloak.logout(window.location.origin + '/');
+  }
 }

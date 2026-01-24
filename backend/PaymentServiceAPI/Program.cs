@@ -80,6 +80,9 @@ builder.Services.AddAuthorization(options =>
         policy.RequireRole("admin", "operator"));
 });
 
+// Servicios de Vault (KMS)
+builder.Services.AddScoped<PaymentServiceAPI.Services.IVaultService, PaymentServiceAPI.Services.VaultService>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

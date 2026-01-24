@@ -20,3 +20,11 @@ public record EncryptedPayload(
     string EncryptedKey,
     string InitializationVector
 );
+
+public record PaymentData(
+    decimal Amount,
+    string Description,
+    string Currency,
+    DateTime Timestamp,
+    string Source
+);
